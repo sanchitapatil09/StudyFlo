@@ -1,0 +1,16 @@
+{
+  "name": "study-planner-suite",
+  "version": "1.0.0",
+  "description": "Vanilla Web App - 3-Page Study Planner & Quiz Suite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "keywords": ["study-planner", "quiz", "vanilla-js", "express"],
+  "author": "",
+  "license": "ISC"
+}

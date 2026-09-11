@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyFlow - 3-Page Study Planner & Quiz Suite</title>
+  <!-- Chart.js CDN for consistency tracker graph -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">StudyFlow</span>
+          <span class="brand-badge">PRO SUITE</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-links" id="main-nav" aria-label="Main Navigation">
+        <button class="nav-btn active" data-page="dashboard" id="nav-dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-page="assignments" id="nav-assignments">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span>Assignments & Vault</span>
+        </button>
+        <button class="nav-btn" data-page="quiz" id="nav-quiz">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Quiz Center</span>
+        </button>
+      </nav>
+
+      <!-- Right Header Actions -->
+      <div class="header-actions">
+        <!-- Sync indicator -->
+        <div class="sync-badge" id="sync-status" title="Server Sync Status">
+          <span class="sync-dot"></span>
+          <span class="sync-label">Synced</span>
+        </div>
+
+        <!-- Day / Night Mode Toggle Button -->
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Dark/Light Mode" title="Toggle Theme (Alt+T)">
+          <svg class="sun-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span class="theme-label" id="theme-text">Dark</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Container -->
+  <main class="app-main">
+
+    <!-- ================= PAGE 1: DASHBOARD & CONSISTENCY TRACKER ================= -->
+    <section class="page-view active" id="page-dashboard">
+      <div class="view-header">
+        <div>
+          <h1 class="view-title">Dashboard & Consistency Tracker</h1>
+          <p class="view-subtitle" id="dashboard-date-subtitle">Track your focus, assignments, and study milestones</p>
+        </div>
+        <div class="header-buttons">
+          <button class="btn btn-outline" id="open-study-modal-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Log Study Hours</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- High-Level Metric Cards -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-indigo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Total Study Hours</span>
+            <div class="metric-value" id="metric-total-hours">0.0 <span class="metric-unit">hrs</span></div>
+            <span class="metric-trend" id="metric-hours-month">Active logging in current month</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Pending Assignments</span>
+            <div class="metric-value" id="metric-pending-count">0</div>
+            <span class="metric-trend text-amber" id="metric-pending-sub">Awaiting completion</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-emerald">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Completed Tasks</span>
+            <div class="metric-value" id="metric-completed-count">0</div>
+            <span class="metric-trend text-emerald" id="metric-completed-rate">0% completion rate</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap icon-violet">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+          <div class="metric-info">
+            <span class="metric-label">Average Quiz Score</span>
+            <div class="metric-value" id="metric-avg-quiz">0%</div>
+            <span class="metric-trend" id="metric-quiz-total">Across 0 quizzes taken</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Layout: Graph & Subject Manager -->
+      <div class="dashboard-grid">
+        <!-- Interactive Visual Consistency Graph -->
+        <div class="card graph-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Monthly Study Consistency</h2>
+              <p class="card-subtitle">Daily study hours & completed tasks breakdown</p>
+            </div>
+            <div class="graph-legend-badges">
+              <span class="badge-dot dot-primary">Hours Spent</span>
+              <span class="badge-dot dot-secondary">Tasks Done</span>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="consistencyChart" height="280"></canvas>
+          </div>
+          <div class="graph-footer-stats">
+            <div class="g-stat">
+              <span class="g-stat-title">Monthly Active Days</span>
+              <span class="g-stat-num" id="stat-active-days">0</span>
+            </div>
+            <div class="g-stat">
+              <span class="g-stat-title">Peak Daily Focus</span>
+              <span class="g-stat-num" id="stat-peak-hours">0.0h</span>
+            </div>
+            <div class="g-stat">
+              <span class="g-stat-title">Daily Average</span>
+              <span class="g-stat-num" id="stat-avg-hours">0.0h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Subject Manager -->
+        <div class="card subject-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Subject Manager</h2>
+              <p class="card-subtitle">Manage curriculum and customize color tags</p>
+            </div>
+          </div>
+
+          <!-- Add Subject Form -->
+          <form id="add-subject-form" class="subject-form">
+            <div class="form-group">
+              <label for="subject-name-input">Subject Name</label>
+              <input type="text" id="subject-name-input" placeholder="e.g., Organic Chemistry" required maxlength="30">
+            </div>
+            
+            <div class="form-group">
+              <label>Choose Color Tag</label>
+              <div class="color-picker-wrapper">
+                <input type="color" id="subject-color-input" value="#6366f1" title="Choose color">
+                <div class="color-swatches" id="color-swatches">
+                  <span class="color-swatch active" data-color="#6366f1" style="background:#6366f1"></span>
+                  <span class="color-swatch" data-color="#0ea5e9" style="background:#0ea5e9"></span>
+                  <span class="color-swatch" data-color="#10b981" style="background:#10b981"></span>
+                  <span class="color-swatch" data-color="#f59e0b" style="background:#f59e0b"></span>
+                  <span class="color-swatch" data-color="#ec4899" style="background:#ec4899"></span>
+                  <span class="color-swatch" data-color="#8b5cf6" style="background:#8b5cf6"></span>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Add Subject</span>
+            </button>
+          </form>
+
+          <!-- Subjects Tag List -->
+          <div class="subjects-list-container">
+            <h3 class="subsection-title">Active Subjects (<span id="subject-count">0</span>)</h3>
+            <div class="subjects-chip-list" id="subjects-chip-list">
+              <!-- Dynamically populated subject tags -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 2: ASSIGNMENT & RESOURCE HUB ================= -->
+    <section class="page-view" id="page-assignments">
+      <div class="view-header">
+        <div>
+          <h1 class="view-title">Assignment & Resource Hub</h1>
+          <p class="view-subtitle">Manage assignments, track deadlines, and organize study references</p>
+        </div>
+        <div class="header-buttons">
+          <button class="btn btn-primary" id="open-assignment-modal-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            <span>New Assignment</span>
+          </button>
+          <button class="btn btn-outline" id="open-resource-modal-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/></svg>
+            <span>Add Resource</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hub-grid">
+        <!-- LEFT COLUMN: Assignment Tracker -->
+        <div class="hub-column">
+          <div class="card">
+            <div class="card-header border-bottom">
+              <div class="header-with-badge">
+                <h2 class="card-title">Assignment Tracker</h2>
+                <span class="count-badge" id="assignment-total-badge">0 Total</span>
+              </div>
+              <!-- Tabs / Filters -->
+              <div class="filter-tabs" id="assignment-filter-tabs">
+                <button class="tab-btn active" data-filter="all">All</button>
+                <button class="tab-btn" data-filter="pending">Pending</button>
+                <button class="tab-btn" data-filter="completed">Completed</button>
+              </div>
+            </div>
+
+            <!-- Filter Toolbar -->
+            <div class="filter-toolbar">
+              <div class="search-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="assignment-search" placeholder="Search assignments...">
+              </div>
+              <select id="assignment-subject-filter" class="form-select filter-select">
+                <option value="all">All Subjects</option>
+              </select>
+            </div>
+
+            <!-- Assignments List -->
+            <div class="assignment-list" id="assignment-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Resource Vault -->
+        <div class="hub-column">
+          <div class="card">
+            <div class="card-header border-bottom">
+              <div class="header-with-badge">
+                <h2 class="card-title">Resource Vault</h2>
+                <span class="count-badge" id="resource-total-badge">0 Links/Notes</span>
+              </div>
+              <select id="resource-subject-filter" class="form-select filter-select">
+                <option value="all">All Subjects</option>
+              </select>
+            </div>
+
+            <!-- Search Resource -->
+            <div class="filter-toolbar">
+              <div class="search-input-wrap" style="width:100%">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="resource-search" placeholder="Search references, cheat sheets, links...">
+              </div>
+            </div>
+
+            <!-- Resource Cards List -->
+            <div class="resource-list" id="resource-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 3: QUIZ CENTER WITH DIGITAL TIMER ================= -->
+    <section class="page-view" id="page-quiz">
+
+      <!-- SUB-VIEW 1: Quiz Configurator -->
+      <div class="quiz-subview" id="quiz-config-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Quiz Center</h1>
+            <p class="view-subtitle">Test your knowledge with timed subject challenges</p>
+          </div>
+        </div>
+
+        <div class="quiz-grid">
+          <!-- Configurator Card -->
+          <div class="card quiz-config-card">
+            <div class="card-header">
+              <h2 class="card-title">Configure New Quiz</h2>
+              <span class="badge-pill">Timed Assessment</span>
+            </div>
+
+            <form id="quiz-config-form">
+              <div class="form-group">
+                <label for="quiz-subject-select">Select Subject</label>
+                <select id="quiz-subject-select" class="form-select" required>
+                  <!-- Populated from subjects -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="quiz-topic-select">Select Topic</label>
+                <select id="quiz-topic-select" class="form-select" required>
+                  <!-- Populated dynamically based on subject -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Difficulty & Time per Question</label>
+                <div class="difficulty-picker">
+                  <label class="diff-option">
+                    <input type="radio" name="difficulty" value="Easy" checked>
+                    <div class="diff-card">
+                      <span class="diff-badge diff-easy">Easy</span>
+                      <span class="diff-time">60s / question</span>
+                    </div>
+                  </label>
+                  <label class="diff-option">
+                    <input type="radio" name="difficulty" value="Medium">
+                    <div class="diff-card">
+                      <span class="diff-badge diff-med">Medium</span>
+                      <span class="diff-time">45s / question</span>
+                    </div>
+                  </label>
+                  <label class="diff-option">
+                    <input type="radio" name="difficulty" value="Hard">
+                    <div class="diff-card">
+                      <span class="diff-badge diff-hard">Hard</span>
+                      <span class="diff-time">30s / question</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="quiz-question-count">Number of Questions</label>
+                <select id="quiz-question-count" class="form-select">
+                  <option value="5">5 Questions (Quick Drill)</option>
+                  <option value="8">8 Questions (Standard Challenge)</option>
+                </select>
+              </div>
+
+              <div class="quiz-start-summary" id="quiz-start-summary">
+                <div class="summary-item">
+                  <span class="summary-label">Estimated Time:</span>
+                  <strong id="config-time-estimate">5 min 00 sec</strong>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Scoring:</span>
+                  <span>Results automatically logged to graph</span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-large btn-block" id="start-quiz-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Launch Timed Quiz</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Quiz History & Stats Card -->
+          <div class="card quiz-history-card">
+            <div class="card-header">
+              <h2 class="card-title">Recent Quiz History</h2>
+              <span class="count-badge" id="quiz-history-count">0 Completed</span>
+            </div>
+            <div class="quiz-history-list" id="quiz-history-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 2: Active Quiz UI (Interactive) -->
+      <div class="quiz-subview hidden" id="quiz-active-view">
+        <div class="active-quiz-container card">
+          <!-- Quiz Top Header -->
+          <div class="active-quiz-header">
+            <div class="active-meta">
+              <span class="subject-chip" id="active-quiz-subject">Subject</span>
+              <span class="topic-chip" id="active-quiz-topic">Topic</span>
+              <span class="diff-chip" id="active-quiz-difficulty">Medium</span>
+            </div>
+
+            <!-- Digital Countdown Timer Container -->
+            <div class="quiz-timer-wrap" id="timer-container" title="Remaining time">
+              <div class="timer-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div class="timer-digits" id="quiz-timer-clock">00:00</div>
+              <span class="timer-alert-text" id="timer-alert-indicator">FINAL SECONDS!</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar & Question Tracker -->
+          <div class="quiz-progress-tracker">
+            <div class="tracker-text">
+              <span id="quiz-q-tracker">Question 1 of 5</span>
+              <span id="quiz-answered-count">0 answered</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="quiz-progress-fill" style="width: 20%;"></div>
+            </div>
+          </div>
+
+          <!-- Interactive Question Card -->
+          <div class="question-container" id="question-container">
+            <div class="question-num-tag" id="q-number-pill">Q1</div>
+            <h2 class="question-prompt" id="question-text">Loading question prompt...</h2>
+
+            <!-- Multiple Choice Radio Options -->
+            <div class="options-container" id="options-container">
+              <!-- Dynamically injected option cards -->
+            </div>
+          </div>
+
+          <!-- Quiz Controls Bar -->
+          <div class="quiz-controls-bar">
+            <button class="btn btn-outline" id="quiz-prev-btn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <span>Previous</span>
+            </button>
+
+            <div class="center-controls">
+              <button class="btn btn-danger-outline" id="quiz-cancel-btn">Quit Quiz</button>
+            </div>
+
+            <div class="right-controls">
+              <button class="btn btn-primary" id="quiz-next-btn">
+                <span>Next</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+              <button class="btn btn-success hidden" id="quiz-submit-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Submit Quiz</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 3: Results Card & Analysis Breakdown -->
+      <div class="quiz-subview hidden" id="quiz-results-view">
+        <div class="card results-card">
+          <!-- Summary Banner -->
+          <div class="results-banner">
+            <div class="score-circle-wrap">
+              <div class="score-circle" id="result-score-circle">
+                <span class="score-percentage" id="result-percentage">0%</span>
+                <span class="score-fraction" id="result-fraction">0 / 0</span>
+              </div>
+            </div>
+
+            <div class="results-banner-info">
+              <div class="badge-pill" id="result-feedback-badge">Quiz Completed</div>
+              <h2 class="results-title" id="result-feedback-title">Great Performance!</h2>
+              <p class="results-subtitle" id="result-feedback-desc">You showed strong mastery of this topic.</p>
+
+              <div class="result-stats-row">
+                <div class="res-stat">
+                  <span class="res-stat-label">Subject</span>
+                  <strong id="result-subject">Math</strong>
+                </div>
+                <div class="res-stat">
+                  <span class="res-stat-label">Difficulty</span>
+                  <strong id="result-diff">Medium</strong>
+                </div>
+                <div class="res-stat">
+                  <span class="res-stat-label">Time Spent</span>
+                  <strong id="result-time-spent">00:00</strong>
+                </div>
+                <div class="res-stat">
+                  <span class="res-stat-label">Status</span>
+                  <strong class="text-emerald" id="result-auto-log-status">Auto-logged to Tracker</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Answer Analysis Section -->
+          <div class="analysis-section">
+            <h3 class="analysis-heading">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              <span>Question-by-Question Analysis</span>
+            </h3>
+            <div class="analysis-list" id="analysis-list">
+              <!-- Dynamically populated analysis cards -->
+            </div>
+          </div>
+
+          <!-- Results Actions -->
+          <div class="results-actions">
+            <button class="btn btn-outline" id="res-goto-dashboard-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+              <span>View Updated Dashboard</span>
+            </button>
+            <button class="btn btn-primary" id="res-retake-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+              <span>Take Another Quiz</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Modal: Add / Edit Assignment -->
+  <div class="modal-backdrop hidden" id="assignment-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="assignment-modal-title">Create New Assignment</h3>
+        <button class="modal-close-btn" id="close-assignment-modal-btn">&times;</button>
+      </div>
+      <form id="assignment-form">
+        <input type="hidden" id="assignment-edit-id" value="">
+        <div class="form-group">
+          <label for="assignment-title-input">Assignment Title</label>
+          <input type="text" id="assignment-title-input" placeholder="e.g., Problem Set 4 - Integrals" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="assignment-subject-input">Subject</label>
+            <select id="assignment-subject-input" class="form-select" required>
+              <!-- Populated from subjects -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="assignment-due-input">Due Date</label>
+            <input type="date" id="assignment-due-input" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="assignment-status-input">Initial Status</label>
+          <select id="assignment-status-input" class="form-select">
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancel-assignment-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-assignment-btn">Save Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Resource -->
+  <div class="modal-backdrop hidden" id="resource-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Study Resource</h3>
+        <button class="modal-close-btn" id="close-resource-modal-btn">&times;</button>
+      </div>
+      <form id="resource-form">
+        <div class="form-group">
+          <label for="resource-title-input">Resource Title</label>
+          <input type="text" id="resource-title-input" placeholder="e.g., Organic Reaction Mechanisms PDF" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="resource-subject-input">Subject</label>
+            <select id="resource-subject-input" class="form-select" required>
+              <!-- Populated from subjects -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="resource-label-input">Resource Type / Label</label>
+            <select id="resource-label-input" class="form-select">
+              <option value="Cheat Sheet">Cheat Sheet</option>
+              <option value="Video Course">Video Course</option>
+              <option value="Reference">Reference</option>
+              <option value="Practice Problems">Practice Problems</option>
+              <option value="Textbook Notes">Textbook Notes</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="resource-url-input">URL or External Reference Link</label>
+          <input type="url" id="resource-url-input" placeholder="https://example.com/materials" required>
+        </div>
+        <div class="form-group">
+          <label for="resource-notes-input">Study Notes / Description (Optional)</label>
+          <textarea id="resource-notes-input" rows="2" placeholder="Key chapters, login hints, or formula tips..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancel-resource-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Log Study Hours -->
+  <div class="modal-backdrop hidden" id="study-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Log Study Session</h3>
+        <button class="modal-close-btn" id="close-study-modal-btn">&times;</button>
+      </div>
+      <form id="study-log-form">
+        <div class="form-group">
+          <label for="study-date-input">Session Date</label>
+          <input type="date" id="study-date-input" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="study-hours-input">Hours Focused (e.g. 2.5)</label>
+            <input type="number" id="study-hours-input" step="0.25" min="0.25" max="24" placeholder="2.5" required>
+          </div>
+          <div class="form-group">
+            <label for="study-tasks-input">Tasks / Milestones Completed</label>
+            <input type="number" id="study-tasks-input" step="1" min="0" max="50" placeholder="2" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="cancel-study-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save to Consistency Graph</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Audio Context Synthesizer (Built-in script) & App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
